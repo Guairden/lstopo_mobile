@@ -16,6 +16,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -24,7 +25,9 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import org.w3c.dom.Text;
@@ -38,8 +41,11 @@ public class MainActivity extends AppCompatActivity {
 
     private ScaleGestureDetector mScaleGestureDetector;
     private float mScaleFactor = 1.0f;
-    GestureDetector gestureDetector;
+    private Spinner spinner;
     private RelativeLayout linearLayout;
+    private String selectedItem = "";
+    private Activity activity = this;
+
 
     Lstopo lstopo;
 
@@ -51,49 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
         linearLayout = findViewById(R.id.relative_layout);
         mScaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
+        addListenerOnSpinnerItemSelection();
         lstopo = new Lstopo(this);
 
         draw(lstopo);
-
-        /*final Button button1 = new Button(this);
-        final Button button2 = new Button(this);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                400,
-                200
-        );
-
-        button1.setText("Text output");
-        button1.setX(0);
-        button1.setLayoutParams(params);
-
-        button2.setText("Designed output");
-        button2.setX(screen_width - 400);
-        button2.setLayoutParams(params);
-
-        button1.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                linearLayout.removeView(button2);
-                linearLayout.removeView(view);
-                text(lstopo);
-            }
-        });
-
-        button2.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                linearLayout.removeView(button1);
-                linearLayout.removeView(view);
-                test(lstopo);
-            }
-        });
-
-        linearLayout.addView(button1);
-        linearLayout.addView(button2);
-        */
     }
 
     @Override
@@ -115,10 +82,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
+    public void addListenerOnSpinnerItemSelection() {
+        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+    }
+
+    private class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            if ( selectedItem == "Draw"){
+                linearLayout.removeAllViews();
+                text(lstopo);
+                selectedItem = "Text";
+            }
+
+            else if(selectedItem == "Text"){
+                linearLayout.removeAllViews();
+                draw(lstopo);
+                selectedItem = "Draw";
+            }
+
+            else
+                selectedItem = "Draw";
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> arg0) {
+
+        }
+
+    }
+
     public native void draw(Lstopo lstopo);
     public native void text(Lstopo lstopo);
 }
